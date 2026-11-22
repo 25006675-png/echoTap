@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d6ecfb">
+<title>EchoTap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b1f5c; --purple:#8b6fd0; --purple-d:#6a4fb3; --purple-l:#e4dcf8;
+  --cream:#fbf3e0;
+  --font:'Baloo 2','Segoe UI Rounded',system-ui,'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:var(--font);color:var(--ink);background:#ece8f8;display:flex;align-items:center;justify-content:center}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
+
+#app{position:relative;width:100%;height:100%;max-width:430px;max-height:900px;overflow:hidden;background:#fdfbf6}
+@media(min-width:500px) and (min-height:760px){
+  #app{height:min(900px,96vh);border-radius:44px;box-shadow:0 0 0 9px #26233a,0 30px 70px rgba(60,40,120,.3)}
+}
+.sky{position:absolute;inset:0 0 auto 0;height:46%;background:linear-gradient(#cfe9fb,#eaf4fb 70%,#fdfbf6);z-index:0}
+.grass{position:absolute;left:0;right:0;bottom:0;height:70px;z-index:0;pointer-events:none;
+  background:radial-gradient(60px 50px at 8% 100%,#b6e08a 98%,transparent),radial-gradient(70px 45px at 96% 100%,#a9d97c 98%,transparent),radial-gradient(50px 30px at 25% 105%,#cdeaa8 98%,transparent)}
+.cloud{position:absolute;background:#fff;border-radius:50px;opacity:.9;z-index:0}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud.a{width:90px;height:26px;left:-18px;top:70px}.cloud.a::before{width:40px;height:40px;left:18px;top:-20px}.cloud.a::after{width:30px;height:30px;left:50px;top:-12px}
+.cloud.b{width:80px;height:24px;right:-14px;top:84px}.cloud.b::before{width:36px;height:36px;left:14px;top:-18px}.cloud.b::after{width:28px;height:28px;left:44px;top:-10px}
+
+.statusbar{position:absolute;left:0;right:0;top:0;z-index:3;height:44px;padding:14px 28px 0;display:none;justify-content:space-between;font-weight:800;font-size:15px}
+@media(min-width:500px) and (min-height:760px){.statusbar{display:flex}}
+
+.screen{position:absolute;inset:0;display:none;flex-direction:column;z-index:1}
+.screen.on{display:flex}
+.screen>.pad{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;min-height:0;padding:44px 18px 0}
+@media(max-width:499px),(max-height:759px){.screen>.pad{padding-top:max(14px,env(safe-area-inset-top))}}
+
+.logo{display:flex;align-items:center;justify-content:center;gap:8px;margin:2px auto 0}
+.logo img{height:46px}
+.logo b{font-size:38px;font-weight:800;letter-spacing:-1px;line-height:1}
+.logo.big img{height:62px}.logo.big b{font-size:50px}
+
+.lang{display:inline-flex;border:2.5px solid var(--purple);border-radius:999px;overflow:hidden;background:#fff;font-weight:800;font-size:16px;flex:none}
+.lang button{padding:3px 16px;line-height:1.3;color:var(--purple-d)}
+.lang button.on{background:var(--purple);color:#fff}
+
+.back{width:50px;height:50px;border-radius:16px;background:var(--cream);box-shadow:0 3px 8px rgba(80,60,140,.15);display:grid;place-items:center;flex:none}
+.back svg{width:26px;height:26px}
+.bar{display:flex;align-items:center;gap:12px;margin:12px 0 14px}
+.bar h2{margin:0;flex:1;font-size:28px;white-space:nowrap;min-width:0;font-weight:800;display:flex;align-items:center;gap:8px}
+.bar h2 img{height:34px}
+
+/* Home */
+.hero,.thero{position:relative;overflow:hidden;flex:none;margin:6px -18px 0;aspect-ratio:1600/700;
+  background:
+    radial-gradient(ellipse 46% 64% at 50% 100%,#fdeebf 0 99%,transparent 100%),
+    radial-gradient(ellipse 34% 40% at 4% 100%,#cfe8a6 0 99%,transparent 100%),
+    radial-gradient(ellipse 34% 46% at 98% 100%,#cfe8a6 0 99%,transparent 100%)}
+.hero::after,.thero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-1px;height:8%;background:#fdfbf6;border-radius:50% 50% 0 0/100% 100% 0 0;z-index:2}
+.hero img,.thero img{position:absolute;left:0;bottom:0;width:100%;height:100%;object-fit:contain;object-position:bottom;z-index:1}
+.langrow{display:flex;justify-content:flex-end;margin-top:8px}
+.big-btn{flex:1;min-height:0;max-height:150px;border-radius:40px;display:flex;align-items:center;gap:6px;padding:0 20px;margin-top:14px;
+  font-size:46px;font-weight:800;box-shadow:inset 0 -6px 14px rgba(255,255,255,.5),0 6px 14px rgba(110,90,170,.15);transition:transform .1s}
+.big-btn:active{transform:scale(.97)}
+.big-btn img{height:92px;width:42%;object-fit:contain;flex:none}
+.big-btn span{flex:1;text-align:center}
+.big-btn.learn{background:linear-gradient(#dcd2f6,#c9bdef)}
+.big-btn.express{background:linear-gradient(#d3f0e2,#b8e6cf)}
+.teacher-link{margin:16px auto 20px;display:flex;align-items:center;gap:12px;background:var(--cream);border-radius:999px;padding:10px 24px;font-size:20px;font-weight:800;box-shadow:0 2px 6px rgba(120,100,60,.1);flex:none}
+.teacher-link svg{width:28px;height:28px}
+
+/* Cards */
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:96px;align-content:start;grid-auto-rows:minmax(0,340px)}
+.card{border-radius:34px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px 8px 8px;position:relative;
+  box-shadow:inset 0 -6px 12px rgba(255,255,255,.55),0 4px 10px rgba(110,90,170,.12);border:4px solid transparent;transition:transform .1s;min-height:0}
+.card:active{transform:scale(.96)}
+.card .pic{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.card .pic img{max-height:100%;max-width:86%;object-fit:contain}
+.card .lbl{font-size:34px;font-weight:800;line-height:1.1;padding:2px 0 4px;text-align:center}
+.card.playing{border-color:var(--purple);box-shadow:0 0 0 4px rgba(139,111,208,.25),0 6px 16px rgba(110,90,170,.25)}
+.card .badge{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;background:var(--purple);display:none;place-items:center}
+.card.playing .badge{display:grid}
+.badge svg{width:24px;height:24px}
+.c1{background:linear-gradient(#e6defa,#dcd2f5)}.c2{background:linear-gradient(#fdf0d2,#fbe8c0)}
+.c3{background:linear-gradient(#dcf5e6,#cdeedb)}.c4{background:linear-gradient(#fde2e8,#fad3dc)}
+.empty{grid-column:1/-1;text-align:center;font-size:22px;padding:40px}
+
+.tabbar{position:absolute;z-index:5;left:12px;right:12px;bottom:14px;background:var(--cream);border-radius:34px;display:flex;padding:6px;box-shadow:0 4px 14px rgba(110,90,170,.2)}
+.tabbar[hidden]{display:none}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;padding:5px 0 3px;border-radius:26px;font-size:17px;font-weight:800;color:var(--purple-d)}
+.tabbar button.on{background:#dfd3f6}
+.tabbar svg,.tabbar img{height:34px;width:34px;object-fit:contain}
+
+/* Teacher */
+.panel{border-radius:30px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:12px;box-shadow:inset 0 -4px 10px rgba(255,255,255,.5)}
+.panel .ic{width:74px;flex:none;display:grid;place-items:center;border-right:2px solid rgba(110,90,170,.25);padding-right:12px;align-self:stretch}
+.panel .ic svg{width:60px;height:60px}
+.panel .bd{flex:1;min-width:0}
+.panel h3{margin:0 0 4px;font-size:21px;font-weight:800;line-height:1.1}
+.panel p{margin:0 0 6px;font-size:15px;font-weight:600;opacity:.85;line-height:1.2}
+.p-purple{background:linear-gradient(#e9e2fa,#ddd3f5)}.p-mint{background:linear-gradient(#daf3e6,#cbeed9)}
+.select{width:100%;border:2px solid #cfc3ee;border-radius:999px;background:#fff;padding:7px 16px;font:inherit;font-weight:800;font-size:18px;color:var(--ink)}
+.stepper{display:flex;align-items:center;justify-content:space-between;background:#fff;border:2px solid #cfc3ee;border-radius:999px;padding:3px}
+.stepper button{width:44px;height:36px;border-radius:999px;background:var(--purple-l);font-size:26px;font-weight:800;color:var(--purple-d);line-height:1}
+.stepper b{font-size:26px}
+.btn-main{width:100%;background:linear-gradient(#9a7fdc,#7a5cc4);color:#fff;border-radius:999px;padding:9px 16px;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 0 var(--purple-d)}
+.btn-main:active{transform:translateY(2px);box-shadow:0 2px 0 var(--purple-d)}
+.btn-soft{width:100%;background:var(--cream);border:2px solid #e8dcc0;border-radius:999px;padding:8px 16px;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-del{background:var(--cream);color:#b53a3a;border-radius:999px;padding:9px 34px;font-size:20px;font-weight:800;display:flex;gap:10px;align-items:center;justify-content:center;margin:12px auto 0}
+.vol{display:flex;align-items:center;gap:10px}
+.vol input{flex:1;min-width:0;accent-color:var(--purple)}
+.vol .pct{background:#fff;border:2px solid #cfc3ee;border-radius:999px;padding:3px 12px;font-weight:800;font-size:17px}
+.scroll{flex:1;overflow-y:auto;min-height:0;padding-bottom:24px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.thero{margin:0 -18px 6px;aspect-ratio:1600/640}
+
+.row{display:flex;align-items:center;gap:12px;background:#fff;border-radius:24px;padding:10px 12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(110,90,170,.12)}
+.row .th{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;flex:none}
+.row .th img{max-height:84%;max-width:84%}
+.row .tx{flex:1;font-weight:800;font-size:20px;line-height:1.1}
+.row .tx small{display:block;font-size:14px;opacity:.7;font-weight:600}
+.row .vis{width:50px;height:30px;border-radius:99px;background:#d9d5e6;position:relative;flex:none}
+.row .vis::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}
+.row .vis.on{background:var(--purple)}.row .vis.on::after{left:23px}
+.row .edit{width:40px;height:40px;border-radius:50%;background:var(--purple-l);display:grid;place-items:center;flex:none}
+.sec{font-weight:800;font-size:18px;margin:10px 4px 8px;opacity:.8}
+
+.editbar{background:linear-gradient(#e9e2fa,#d9cef4);border-radius:26px;display:flex;align-items:center;padding:7px 12px;gap:10px;margin:12px 0}
+.editbar h2{flex:1;margin:0;text-align:center;font-size:28px;font-weight:800;padding-right:44px}
+.editbar .back{width:42px;height:42px;border-radius:14px;background:#fff}
+.preview{width:190px;height:170px;margin:0 auto 12px;border:5px solid var(--purple);border-radius:30px;background:#fff;display:grid;place-items:center;box-shadow:0 6px 14px rgba(110,90,170,.2)}
+.preview img{max-width:80%;max-height:84%}
+.field{display:flex;align-items:center;gap:10px;border-radius:22px;padding:8px 12px;margin-bottom:10px}
+.field label{font-weight:800;font-size:19px;width:92px;flex:none}
+.field input{flex:1;min-width:0;border:2px solid #cfc3ee;border-radius:999px;padding:8px 16px;font:inherit;font-weight:800;font-size:20px;color:var(--ink);background:#fff}
+.aud{border-radius:24px;padding:10px 12px;margin-bottom:10px}
+.aud .top{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px}
+.aud .top span{flex:1}
+.aud .up{border:2px solid #cfc3ee;background:#fff;border-radius:999px;padding:5px 12px;font-size:15px;font-weight:800;color:var(--purple-d)}
+.aud .pl{display:flex;align-items:center;gap:10px;margin-top:6px}
+.aud .pl button{width:36px;height:36px;border-radius:50%;background:var(--purple);display:grid;place-items:center}
+.aud .pl i{flex:1;height:7px;border-radius:9px;background:rgba(110,90,170,.25)}
+.aud .pl small{font-weight:700;font-size:14px;opacity:.75}
+
+/* PIN */
+.pin{align-items:center;text-align:center}
+.pin h2{font-size:30px;margin:20px 0 4px}
+.pin p{margin:0 0 16px;font-weight:600;opacity:.8;font-size:17px}
+.dots{display:flex;gap:12px;justify-content:center;margin-bottom:20px}
+.dots i{width:20px;height:20px;border-radius:50%;border:3px solid var(--purple)}
+.dots i.f{background:var(--purple)}
+.dots.err{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.keys{display:grid;grid-template-columns:repeat(3,76px);gap:12px;justify-content:center}
+.keys button{height:62px;border-radius:22px;background:var(--cream);font-size:28px;font-weight:800;box-shadow:0 3px 0 #e6d9b8}
+.keys button:active{transform:translateY(2px);box-shadow:0 1px 0 #e6d9b8}
+.hint{margin-top:16px;font-size:14px;font-weight:600;opacity:.7}
+.toast{position:absolute;z-index:20;left:50%;bottom:100px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:99px;font-weight:700;font-size:16px;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+
+/* ---------- Tablet / web layout (no phone frame) ---------- */
+@media(min-width:700px){
+  #app{max-width:none;max-height:none;width:100%;height:100%;border-radius:0;box-shadow:none}
+  .statusbar{display:none}
+  .sky{height:55%}
+  .screen>.pad{width:100%;max-width:1100px;margin:0 auto;padding:28px 32px 0}
+  .logo{margin:0}
+  .logo img{height:54px}.logo b{font-size:44px}
+  .logo.big img{height:72px}.logo.big b{font-size:58px}
+  .lang{font-size:20px}.lang button{padding:5px 22px}
+  .bar{margin:20px 0 22px}
+  .bar h2{font-size:38px}.bar h2 img{height:46px}
+  .back{width:60px;height:60px}
+
+  /* Home: banner on top, two big buttons side by side */
+  #home .pad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;column-gap:24px;align-content:start;justify-content:stretch}
+  #home .logo{grid-column:1;justify-self:start}
+  #home .langrow{grid-column:2;justify-content:flex-end;align-self:center;margin:0}
+  .hero,.thero{background:none;aspect-ratio:auto;overflow:hidden;--fade:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+  .hero::before,.thero::before{content:"";position:absolute;inset:0;-webkit-mask-image:var(--fade);mask-image:var(--fade);
+    background:
+      radial-gradient(ellipse 34% 58% at 50% 100%,#fdeebf 0 99%,transparent 100%),
+      radial-gradient(ellipse 24% 36% at 14% 100%,#cfe8a6 0 99%,transparent 100%),
+      radial-gradient(ellipse 24% 42% at 86% 100%,#cfe8a6 0 99%,transparent 100%)}
+  .hero::after,.thero::after{-webkit-mask-image:var(--fade);mask-image:var(--fade)}
+  .hero img,.thero img{left:50%;transform:translateX(-50%);width:760px;max-width:100%}
+  #home .hero{grid-column:1/-1;width:100%;height:332px;margin:10px 0 0}
+  #teacher .thero{height:300px}
+  #home .big-btn{grid-row:3;max-height:none;height:190px;margin-top:8px;font-size:clamp(38px,5vw,56px);padding:0 24px}
+  #home .big-btn.learn{grid-column:1}
+  #home .big-btn.express{grid-column:2}
+  #home .big-btn img{height:120px;width:38%}
+  #home .teacher-link{grid-column:1/-1;grid-row:4;margin:24px auto 0;font-size:22px}
+
+  /* Learn / Express: grid fills the width */
+  .grid{grid-template-columns:repeat(auto-fit,minmax(230px,280px));justify-content:center;grid-auto-rows:minmax(0,320px);gap:20px;padding-bottom:120px}
+  .card .lbl{font-size:36px}
+  .tabbar{left:50%;right:auto;transform:translateX(-50%);width:520px;bottom:20px}
+
+  /* Teacher screens: centred, two columns of panels */
+  #teacher .pad{max-width:980px}
+  #teacher .scroll{display:grid;grid-template-columns:1fr 1fr;column-gap:20px;align-content:start}
+  #teacher .thero{grid-column:1/-1;width:100%;margin:0 0 12px}
+  #manage .pad,#edit .pad{max-width:680px}
+  #pin .pad{max-width:520px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="sky"></div><div class="cloud a"></div><div class="cloud b"></div><div class="grass"></div>
+  <div class="statusbar"><span>9:41</span><span>100%</span></div>
+
+  <!-- HOME -->
+  <section class="screen on" id="home"><div class="pad">
+    <div class="logo big"><img src="img/logo.png" alt=""><b>EchoTap</b></div>
+    <div class="langrow"><div class="lang" data-lang></div></div>
+    <div class="hero"><img src="img/kids_cut.png" alt=""></div>
+    <button class="big-btn learn" data-go="learn"><img src="img/books.png" alt=""><span>Learn</span></button>
+    <button class="big-btn express" data-go="express"><img src="img/express.png" alt=""><span>Express</span></button>
+    <button class="teacher-link" data-go="pin"><svg viewBox="0 0 24 24" fill="#8b6fd0"><path d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm8.4 5.1l1.9 1.5-2 3.4-2.300-.9c-.5.400-1.100.800-1.700 1l-.4 2.400h-4l-.4-2.400c-.6-.2-1.200-.6-1.700-1l-2.300.9-2-3.400 1.900-1.500a7 7 0 010-3.200L2.500 8.900l2-3.400 2.300.9c.5-.4 1.100-.8 1.700-1L8.900 2.900h4l.4 2.500c.6.200 1.200.6 1.700 1l2.300-.9 2 3.400-1.900 1.500a7 7 0 010 3.200z" transform="translate(-.4 .6)"/></svg>Teacher Settings<span>&rsaquo;</span></button>
+  </div></section>
+
+  <!-- LEARN -->
+  <section class="screen" id="learn"><div class="pad">
+    <div class="logo"><img src="img/logo.png" alt=""><b>EchoTap</b></div>
+    <div class="bar"><button class="back" data-go="home" aria-label="Back"></button><h2><img src="img/books.png" alt="">Learn</h2><div class="lang" data-lang></div></div>
+    <div class="grid" id="gridLearn"></div>
+  </div></section>
+
+  <!-- EXPRESS -->
+  <section class="screen" id="express"><div class="pad">
+    <div class="logo"><img src="img/logo.png" alt=""><b>EchoTap</b></div>
+    <div class="bar"><button class="back" data-go="home" aria-label="Back"></button><h2><img src="img/express.png" alt="">Express</h2><div class="lang" data-lang></div></div>
+    <div class="grid" id="gridExpress"></div>
+  </div></section>
+
+  <!-- PIN -->
+  <section class="screen" id="pin"><div class="pad pin">
+    <div class="logo"><img src="img/logo.png" alt=""><b>EchoTap</b></div>
+    <h2>Teacher PIN</h2><p>Enter your 6-digit PIN</p>
+    <div class="dots" id="dots"></div>
+    <div class="keys" id="keys"></div>
+    <button class="btn-soft" style="width:auto;margin-top:18px;padding:8px 28px" data-go="home">Cancel</button>
+    <div class="hint">Prototype PIN: 123456</div>
+  </div></section>
+
+  <!-- TEACHER -->
+  <section class="screen" id="teacher"><div class="pad">
+    <div class="bar" style="margin-top:0"><button class="back" data-go="home" aria-label="Back"></button><h2 style="justify-content:center;padding-right:50px;font-size:26px">Teacher Settings</h2></div>
+    <div class="scroll">
+      <div class="thero"><img src="img/teacher_cut.png" alt=""></div>
+      <div class="panel p-purple"><div class="ic"><svg viewBox="0 0 64 64"><circle cx="24" cy="26" r="18" fill="#e4d6fb" stroke="#1b1f5c" stroke-width="3"/><text x="24" y="33" text-anchor="middle" font-size="22" font-weight="800" fill="#1b1f5c">A</text><circle cx="44" cy="42" r="15" fill="#fbe08a" stroke="#1b1f5c" stroke-width="3"/><text x="44" y="49" text-anchor="middle" font-size="19" font-weight="800" fill="#1b1f5c">中</text></svg></div>
+        <div class="bd"><h3>Language Preference</h3><select class="select" id="langSel"><option value="bm">Bahasa Melayu</option><option value="zh">中文</option></select></div></div>
+      <div class="panel p-mint"><div class="ic"><img src="img/apple.png" style="width:54px" alt=""></div>
+        <div class="bd"><h3>Number of Visible Cards</h3><div class="stepper"><button id="minus">&minus;</button><b id="vcount">4</b><button id="plus">+</button></div></div></div>
+      <div class="panel p-purple"><div class="ic"><svg viewBox="0 0 64 64"><rect x="6" y="10" width="38" height="38" rx="8" fill="#dcc9f5"/><rect x="18" y="20" width="40" height="38" rx="8" fill="#fff" stroke="#1b1f5c" stroke-width="3"/><path d="M22 52l12-14 8 8 6-6 6 8z" fill="#7bc77b"/><circle cx="46" cy="30" r="5" fill="#f9c846"/></svg></div>
+        <div class="bd"><h3>Manage Cards</h3><p>Add, edit, hide, or reorder cards.</p><button class="btn-main" data-go="manage">&#9998; Manage Content &rsaquo;</button></div></div>
+      <div class="panel p-mint"><div class="ic"><svg viewBox="0 0 64 64"><path d="M18 50a12 12 0 01-2-24 16 16 0 0130-4 13 13 0 013 28z" fill="#fff" stroke="#1b1f5c" stroke-width="3"/><path d="M26 44V30m0 0l-5 5m5-5l5 5M38 30v14m0 0l-5-5m5 5l5-5" stroke="#1b1f5c" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="bd"><h3>Backup &amp; Restore</h3><p>Save your data or restore from a backup.</p><button class="btn-soft" id="backup">Backup / Restore &rsaquo;</button></div></div>
+      <div class="panel p-purple"><div class="ic"><svg viewBox="0 0 64 64"><path d="M8 26h12l16-12v36L20 38H8z" fill="#b9a4ea" stroke="#6a4fb3" stroke-width="3" stroke-linejoin="round"/><path d="M42 24q6 8 0 16M48 18q11 14 0 28" stroke="#f9c846" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="bd"><h3>Audio Volume</h3><div class="vol"><input type="range" id="vol" min="0" max="100" value="80"><span class="pct" id="volp">80%</span></div></div></div>
+    </div>
+  </div></section>
+
+  <!-- MANAGE -->
+  <section class="screen" id="manage"><div class="pad">
+    <div class="bar" style="margin-top:0"><button class="back" data-go="teacher" aria-label="Back"></button><h2 style="justify-content:center;padding-right:50px">Manage Cards</h2></div>
+    <div class="scroll" id="manageList"></div>
+  </div></section>
+
+  <!-- EDIT -->
+  <section class="screen" id="edit"><div class="pad">
+    <div class="editbar"><button class="back" data-go="manage" aria-label="Back"></button><h2>Edit Card</h2></div>
+    <div class="scroll">
+      <div class="preview"><img id="eImg" alt=""></div>
+      <div class="field p-purple"><label>BM Label</label><input id="eBM"></div>
+      <div class="field p-mint"><label>中文 Label</label><input id="eZH"></div>
+      <div class="aud p-purple"><div class="top"><span>BM Audio</span><button class="up" data-up>Upload / Replace</button></div><div class="pl"><button data-prev="bm" aria-label="Play"><svg width="16" height="16" viewBox="0 0 16 16" fill="#fff"><path d="M4 2l10 6-10 6z"/></svg></button><i></i><small>0:00 / 0:02</small></div></div>
+      <div class="aud p-mint"><div class="top"><span>中文 Audio</span><button class="up" data-up>Upload / Replace</button></div><div class="pl"><button data-prev="zh" aria-label="Play"><svg width="16" height="16" viewBox="0 0 16 16" fill="#fff"><path d="M4 2l10 6-10 6z"/></svg></button><i></i><small>0:00 / 0:02</small></div></div>
+      <button class="btn-main" style="font-size:24px;padding:14px" id="save">&#10003; Save Changes</button>
+      <button class="btn-del" data-del>Delete Card</button>
+    </div>
+  </div></section>
+
+  <nav class="tabbar" id="tabbar" hidden>
+    <button data-go="home"><svg viewBox="0 0 24 24" fill="#8b6fd0"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>Home</button>
+    <button data-go="learn"><img src="img/books.png" alt="">Learn</button>
+    <button data-go="express"><img src="img/express.png" alt="">Express</button>
+  </nav>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const BACK='<svg viewBox="0 0 24 24" fill="none" stroke="#1b1f5c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5m6-7l-7 7 7 7"/></svg>';
+const SPK='<svg viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+document.querySelectorAll('.back').forEach(b=>b.innerHTML=BACK);
+
+/* Card model. audioBM / audioZH are file paths; if the file is missing the
+   browser speech synthesis reads the label (placeholder until recordings exist). */
+const state={
+  lang:'bm', volume:.8, visibleCount:4, editId:null, last:null,
+  cards:[
+    {id:'apple',mode:'learn',labelBM:'Epal',labelZH:'苹果',image:'img/apple.png',audioBM:'audio/apple_bm.mp3',audioZH:'audio/apple_zh.mp3',order:1,visible:true,tint:'c1'},
+    {id:'cat',mode:'learn',labelBM:'Kucing',labelZH:'猫',image:'img/cat.png',audioBM:'audio/cat_bm.mp3',audioZH:'audio/cat_zh.mp3',order:2,visible:true,tint:'c2'},
+    {id:'drink',mode:'express',labelBM:'Minum',labelZH:'喝水',image:'img/drink.png',audioBM:'audio/drink_bm.mp3',audioZH:'audio/drink_zh.mp3',order:1,visible:true,tint:'c3'},
+    {id:'toilet',mode:'express',labelBM:'Tandas',labelZH:'厕所',image:'img/toilet.png',audioBM:'audio/toilet_bm.mp3',audioZH:'audio/toilet_zh.mp3',order:2,visible:true,tint:'c2'}
+  ]
+};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1800)}
+
+/* ---------- audio ---------- */
+let curAudio=null;
+function speak(card,lang){
+  const label=lang==='bm'?card.labelBM:card.labelZH;
+  const fallback=()=>{
+    if(!('speechSynthesis' in window))return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(label);
+    u.lang=lang==='bm'?'ms-MY':'zh-CN';u.volume=state.volume;u.rate=.8;
+    speechSynthesis.speak(u);
+  };
+  if(curAudio){curAudio.pause();curAudio=null}
+  const a=new Audio(lang==='bm'?card.audioBM:card.audioZH);
+  a.volume=state.volume;
+  a.onerror=fallback;
+  a.play().catch(fallback);
+  curAudio=a;
+}
+function play(card){
+  state.last=card;
+  $$('.card').forEach(c=>c.classList.toggle('playing',c.dataset.id===card.id));
+  speak(card,state.lang);
+  clearTimeout(play.h);play.h=setTimeout(()=>$$('.card.playing').forEach(c=>c.classList.remove('playing')),1600);
+}
+
+/* ---------- render ---------- */
+function shown(mode){
+  return state.cards.filter(c=>c.mode===mode&&c.visible).sort((a,b)=>a.order-b.order).slice(0,state.visibleCount);
+}
+function renderGrid(mode,el){
+  const list=shown(mode);
+  el.innerHTML=list.length?list.map(c=>`<button class="card ${c.tint}" data-id="${c.id}"><span class="badge">${SPK}</span><span class="pic"><img src="${c.image}" alt=""></span><span class="lbl">${state.lang==='bm'?c.labelBM:c.labelZH}</span></button>`).join(''):'<div class="empty">No cards yet</div>';
+  el.querySelectorAll('.card').forEach(b=>b.onclick=()=>play(state.cards.find(c=>c.id===b.dataset.id)));
+}
+function renderLang(){
+  $$('[data-lang]').forEach(w=>{
+    w.innerHTML=`<button data-l="bm" class="${state.lang==='bm'?'on':''}">BM</button><button data-l="zh" class="${state.lang==='zh'?'on':''}">中文</button>`;
+    w.querySelectorAll('button').forEach(b=>b.onclick=()=>{state.lang=b.dataset.l;render()});
+  });
+  $('#langSel').value=state.lang;
+}
+function renderManage(){
+  $('#manageList').innerHTML=['learn','express'].map(m=>`<div class="sec">${m==='learn'?'Learn':'Express'}</div>`+
+    state.cards.filter(c=>c.mode===m).sort((a,b)=>a.order-b.order).map(c=>`
+    <div class="row"><div class="th ${c.tint}"><img src="${c.image}" alt=""></div><div class="tx">${c.labelBM}<small>${c.labelZH}</small></div>
+    <button class="vis ${c.visible?'on':''}" data-vis="${c.id}" aria-label="Visible"></button>
+    <button class="edit" data-edit="${c.id}" aria-label="Edit">&#9998;</button></div>`).join('')).join('');
+  $$('[data-vis]').forEach(b=>b.onclick=()=>{const c=state.cards.find(x=>x.id===b.dataset.vis);c.visible=!c.visible;renderManage()});
+  $$('[data-edit]').forEach(b=>b.onclick=()=>{state.editId=b.dataset.edit;go('edit')});
+}
+function render(){
+  renderGrid('learn',$('#gridLearn'));renderGrid('express',$('#gridExpress'));
+  renderLang();renderManage();$('#vcount').textContent=state.visibleCount;
+}
+
+/* ---------- navigation ---------- */
+function go(s){
+  if(s==='edit'){const c=state.cards.find(x=>x.id===state.editId);$('#eImg').src=c.image;$('#eBM').value=c.labelBM;$('#eZH').value=c.labelZH}
+  if(s==='pin')resetPin();
+  render();
+  $$('.screen').forEach(e=>e.classList.toggle('on',e.id===s));
+  $('#tabbar').hidden=!(s==='learn'||s==='express');
+  $$('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.go===s));
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  if(curAudio){curAudio.pause();curAudio=null}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+
+/* ---------- PIN ---------- */
+let pin='';
+const PIN='123456';
+$('#keys').innerHTML=[1,2,3,4,5,6,7,8,9,'',0,'back'].map(k=>k===''?'<span></span>':k==='back'?'<button data-k="back" aria-label="Delete">&#9003;</button>':`<button data-k="${k}">${k}</button>`).join('');
+function drawDots(){$('#dots').innerHTML=[...Array(6)].map((_,i)=>`<i class="${i<pin.length?'f':''}"></i>`).join('')}
+function resetPin(){pin='';drawDots()}
+$$('[data-k]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.k;
+  if(k==='back')pin=pin.slice(0,-1);else if(pin.length<6)pin+=k;
+  drawDots();
+  if(pin.length===6){
+    if(pin===PIN)setTimeout(()=>go('teacher'),150);
+    else{const d=$('#dots');d.classList.add('err');setTimeout(()=>{d.classList.remove('err');resetPin()},350)}
+  }
+});
+
+/* ---------- teacher ---------- */
+$('#langSel').onchange=e=>{state.lang=e.target.value;render()};
+$('#minus').onclick=()=>{state.visibleCount=Math.max(1,state.visibleCount-1);render()};
+$('#plus').onclick=()=>{state.visibleCount=Math.min(20,state.visibleCount+1);render()};
+$('#vol').oninput=e=>{state.volume=e.target.value/100;$('#volp').textContent=e.target.value+'%'};
+$('#backup').onclick=()=>{
+  const blob=new Blob([JSON.stringify({cards:state.cards,visibleCount:state.visibleCount},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='echotap-backup.json';a.click();toast('Backup saved');
+};
+$$('[data-up]').forEach(b=>b.onclick=()=>toast('Upload is not wired in this prototype'));
+$$('[data-prev]').forEach(b=>b.onclick=()=>{const c={...state.cards.find(x=>x.id===state.editId),labelBM:$('#eBM').value,labelZH:$('#eZH').value};speak(c,b.dataset.prev)});
+$('#save').onclick=()=>{const c=state.cards.find(x=>x.id===state.editId);c.labelBM=$('#eBM').value||c.labelBM;c.labelZH=$('#eZH').value||c.labelZH;toast('Saved');go('manage')};
+$('[data-del]').onclick=()=>{if(confirm('Delete this card?')){state.cards=state.cards.filter(c=>c.id!==state.editId);go('manage')}};
+
+render();
+</script>
+</body>
+</html>
