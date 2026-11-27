@@ -1,59 +1,75 @@
-# EchoTap — Project Context & Development Brief
+# React + TypeScript + Vite
 
-## 1. Project Overview
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-**Project:** EchoTap — Accessible Learning & Communication App
-**Client:** Lovely Disabled Home
-**Platform:** Mobile-first Progressive Web App (PWA)
+Currently, two official plugins are available:
 
-EchoTap is a simple picture-based learning and communication application designed for people with disabilities (OKUs), particularly non-verbal users and individuals with intellectual disabilities.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-The application helps users learn familiar words and express basic needs or feelings by tapping large picture cards that play pre-recorded audio in Malay or Chinese.
+## React Compiler
 
-The app should be extremely simple, accessible, visually friendly and suitable for use on shared tablets or smartphones. Teachers facilitate usage and manage the learning content.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-**Core design principle:** Prioritise accessibility and ease of use over feature complexity.
+## Expanding the ESLint configuration
 
-## 2. Proposed Architecture
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-Use a **frontend-only, local-first PWA architecture**, without a backend server or cloud database.
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-**Recommended technology stack:**
-- React + TypeScript + Vite
-- Tailwind CSS for styling
-- IndexedDB (Dexie.js) for local data
-- Service Worker (vite-plugin-pwa) for offline functionality
-- HTML5 Audio API for audio playback
-- Static hosting, such as Cloudflare Pages
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-**Architecture:**
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 
-```text
-EchoTap PWA
-│
-├── Student Interface
-│   ├── Home
-│   ├── Learn Mode
-│   └── Express Mode
-│
-├── Teacher Interface
-│   ├── PIN Access
-│   ├── Card Management
-│   └── App Settings
-│
-├── Application Services
-│   ├── Card Management
-│   ├── Audio Playback
-│   └── Backup / Restore
-│
-├── IndexedDB
-│   ├── Cards and Media
-│   └── Local Settings
-│
-└── Service Worker
-    └── Offline App Caching
 ```
 
-All essential functionality should work without internet after initial installation.
+You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
 
-No separate teacher application or account-based authentication is required.
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
+```
