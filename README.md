@@ -1,75 +1,66 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+# EchoTap — Accessible Learning & Communication App
+ 
+## 1. Project Overview
+ 
+| Item | Details |
+| --- | --- |
+| **Project** | EchoTap — Accessible Learning & Communication App |
+| **Client** | Lovely Disabled Home |
+| **Platform** | Mobile-first Progressive Web App (PWA) |
+ 
+EchoTap is a simple picture-based learning and communication application designed for people with disabilities (OKUs), particularly non-verbal users and individuals with intellectual disabilities.
+ 
+The application helps users learn familiar words and express basic needs or feelings by tapping large picture cards that play pre-recorded audio in Malay or Chinese.
+ 
+The app should be extremely simple, accessible, visually friendly and suitable for use on shared tablets or smartphones. Teachers facilitate usage and manage the learning content.
+ 
+> **Core design principle:** Prioritise accessibility and ease of use over feature complexity.
+ 
+## 2. Proposed Architecture
+ 
+EchoTap uses a **frontend-only, local-first PWA architecture**, without a backend server or cloud database.
+ 
+### Recommended Technology Stack
+ 
+| Technology | Purpose |
+| --- | --- |
+| React + TypeScript + Vite | Frontend application |
+| Tailwind CSS | Styling |
+| IndexedDB (Dexie.js) | Local data storage |
+| Service Worker (`vite-plugin-pwa`) | Offline functionality |
+| HTML5 Audio API | Audio playback |
+| Static hosting (e.g. Cloudflare Pages) | Deployment |
+ 
+### Architecture
+ 
+```text
+EchoTap PWA
+│
+├── Student Interface
+│   ├── Home
+│   ├── Learn Mode
+│   └── Express Mode
+│
+├── Teacher Interface
+│   ├── PIN Access
+│   ├── Card Management
+│   └── App Settings
+│
+├── Application Services
+│   ├── Card Management
+│   ├── Audio Playback
+│   └── Backup / Restore
+│
+├── IndexedDB
+│   ├── Cards and Media
+│   └── Local Settings
+│
+└── Service Worker
+    └── Offline App Caching
 ```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+ 
+### Key Constraints
+ 
+- All essential functionality should work without internet after initial installation.
+- No separate teacher application or account-based authentication is required.
+ 
