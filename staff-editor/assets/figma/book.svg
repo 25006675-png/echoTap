@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="112" height="88" viewBox="0 0 112 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Open book picture">
+<path id="Vector" d="M9 15C28 9 42 12 56 20C70 12 84 9 103 15V74C85 69 71 71 56 78C41 71 27 69 9 74V15Z" fill="#3E7554" stroke-width="2.5" stroke-linejoin="round" stroke="#28533D"/>
+<path id="Vector_2" d="M15 9C30 6 44 9 56 17V70C43 62 29 60 15 63V9Z" fill="#FFFEF5" stroke-width="2.5" stroke-linejoin="round" stroke="#28533D"/>
+<path id="Vector_3" d="M97 9C82 6 68 9 56 17V70C69 62 83 60 97 63V9Z" fill="#F4F6DD" stroke-width="2.5" stroke-linejoin="round" stroke="#28533D"/>
+<g id="Vector_4">
+<path d="M25 26L45 31ZM25 38L45 43ZM67 31L87 26ZM67 43L87 38Z" fill="black"/>
+<path d="M25 26L45 31M25 38L45 43M67 31L87 26M67 43L87 38" stroke-width="3" stroke-linecap="round" stroke="#6D8B62"/>
+</g>
+</g>
+</svg>
